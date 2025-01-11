@@ -1,2 +1,2 @@
 # FugyunFolderCreatorForJava
-ふぎゅんフォルダ作成（Ｊａｖａ版）
+ふぎゅんフォルダ作成（Ｊａｖａ＋Ｓｗｉｎｇ版）
