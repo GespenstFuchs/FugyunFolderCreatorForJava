@@ -616,7 +616,7 @@ public class FugyunFolderCreator extends JFrame
 	 * 行開始位置取得処理
 	 * @param text テキスト
 	 * @param lineIndex 行位置
-	 * @return　行開始位置
+	 * @return 行開始位置
 	 */
 	private int getLineStartOffset(String text, int lineIndex)
 	{
