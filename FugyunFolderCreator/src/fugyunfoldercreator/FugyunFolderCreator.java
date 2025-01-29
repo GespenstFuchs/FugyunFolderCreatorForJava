@@ -2,18 +2,11 @@ package fugyunfoldercreator;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDragEvent;
-import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -318,10 +311,6 @@ public class FugyunFolderCreator extends JFrame
 		// フレームにメインパネルを追加する。
 		getContentPane().add(mainPanel);
 		setVisible(true);
-
-		// ドロップターゲットを設定する。
-		new DropTarget(this, new FolderDropTargetListener(this));
-		new DropTarget(pathTextArea, new FolderDropTargetListener(this));
 
 		// コンテキストメニューを生成する。
 		JPopupMenu contextMenu = new JPopupMenu();
@@ -749,114 +738,6 @@ public class FugyunFolderCreator extends JFrame
 		catch (Exception ex)
 		{
 			utility.showCatchErrorMessage(mainPanel, ex.getMessage());
-		}
-	}
-
-	/**
-	 * ドロップターゲットリスナー
-	 */
-	private class FolderDropTargetListener extends DropTargetAdapter
-	{
-		/**
-		 * コンポーネント
-		 */
-		private Component parent;
-
-		/**
-		 * コンストラクタ
-		 * @param parentComponent 親コンポーネント
-		 */
-		public FolderDropTargetListener(Component parentComponent)
-		{
-			parent = parentComponent;
-		}
-
-		@Override
-		public void dragEnter(DropTargetDragEvent event)
-		{
-			// コピーアクションを許可する。
-			if (event.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-			{
-				event.acceptDrag(DnDConstants.ACTION_COPY);
-			}
-			else
-			{
-				event.rejectDrag();
-			}
-		}
-
-		@Override
-		public void dragOver(DropTargetDragEvent event)
-		{
-			// ドラッグ中もコピーアクションを許可する。
-			if (event.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-			{
-				event.acceptDrag(DnDConstants.ACTION_COPY);
-			}
-			else
-			{
-				event.rejectDrag();
-			}
-		}
-
-		@Override
-		public void drop(DropTargetDropEvent event)
-		{
-			try
-			{
-				if (event.isDataFlavorSupported(DataFlavor.javaFileListFlavor))
-				{
-					event.acceptDrop(DnDConstants.ACTION_COPY);
-
-					Object transferData = event.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
-					if (transferData instanceof List)
-					{
-						// 【型の安全性: Object から List<File> への未検査キャスト】というエラーが発生するので、一旦【List<?>に】キャストしている。
-						List<?> dataList = (List<?>) transferData;
-						List<File> droppedItemList = dataList.stream()
-								.filter(File.class::isInstance)
-								.map(File.class::cast)
-								.toList();
-
-						String pathText = pathTextArea.getText();
-
-						// ドロップした全項目に対して処理を行う。
-						for (File item : droppedItemList)
-						{
-							// 項目を判定する。
-							if (item.isDirectory())
-							{
-								if (pathText.isEmpty())
-								{
-									pathText = item.getAbsolutePath();
-								}
-								else
-								{
-									pathText = pathText + "\n" + item.getAbsolutePath();
-								}
-							}
-						}
-
-						// テキストを設定する。
-						pathTextArea.setText(pathText);
-
-						// パステキストエリアにフォーカスを設定し、カーソルを末尾に設定する。
-						pathTextArea.requestFocusInWindow();
-						pathTextArea.setCaretPosition(pathText.length());
-					}
-
-					event.dropComplete(true);
-				}
-				else
-				{
-					event.rejectDrop();
-				}
-			}
-			catch (Exception e)
-			{
-				utility.showCatchErrorMessage(parent, e.getMessage());
-				event.dropComplete(false);
-			}
 		}
 	}
 }
